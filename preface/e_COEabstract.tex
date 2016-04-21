@@ -1,0 +1,45 @@
+% !Mode:: "TeX:UTF-8"
+% 文字编码：UTF-8
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   LaTeX File for Doctor (Master) Thesis of Peking University
+%   LaTeX + CJK     北京大学博士（硕士）论文模板
+%   Based on Wang Lei's Template for THU
+%   Version: 1.00
+%   Last Update: 2005-05-25
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   Copyright 2004-2005  by  Ying Pan       (yeying_pan@yahoo.com.cn)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   LaTeX File for Doctor (Master) Thesis of Tsinghua University
+%   LaTeX + CJK     清华大学博士（硕士）论文模板
+%   Based on Wang Tianshu's Template for XJTU
+%   Version: 1.00
+%   Last Update: 2003-09-12
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   Copyright 2002-2003  by  Lei Wang (BaconChina)       (bcpub@sina.com)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   LaTeX File for xi'an Jiao Tong University
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   Copyright 2001  by  Wang Tianshu    (tswang@asia.com)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newitemsep
+\renewcommand{\labelenumi}{(\arabic{enumi})}
+\eabstract{
+\thispagestyle{plain}
+
+With the popularity of camera-ready mobile devices and 3G/4G/WiFi wireless infrastructure, interactive video applications with wireless Internet access links are growing exponentially. However, real-time video streaming over wireless networks still faces many challenges such as varying latency, bandwidth fluctuation, and wireless physical packet losses. In this research, we focus on the quality of service (QoS) improvement of real-time video streaming over wireless networks.
+Firstly, we propose a delay-constraint rate control algorithm for real-time video streaming over wireless networks.We first introduce a fluid-queueing model to explore the insight of network congestion. By maintaining a desired number of packets in network queue, we can achieve high bandwidth utilization and low transmission delay. To make rate control more stable and agile, a closed-loop rate control system is designed employing a Proportional-Integral (PI) controller and the control parameters are analyzed using a control-theoretic approach.
+Then, we adopted an expanding window reed-solomon code, and introduce an equivalent error probability to simplify them. Then we are able to formulate the optimal redundancy allocation into a constrained nonlinear optimization problem, where by allocating the redundancy unequally considering the unequal importance of different frames and their dependency based on the expanding window, unequal error protection (UEP) is achieved and the overall distortion is minimized.
+Based on the research above, we made refactoring of an open source VOIP software named Linphone, implemented new modules for rate control and error control, and optimized the UI to fit for TV screen. Compared to traditional real-time video streaming applications, our implementation adapts better with wireless networks and provides higher quality of video streaming.
+
+\vfill
+KEYWORDS: Real-Time Video Streaming, Wireless Networks, Rate Control, Error Control, Real-Time Video System
+}
