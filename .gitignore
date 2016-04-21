@@ -2,3 +2,11 @@
 *.dbj
 *.xdv
 *.tfm
+*.aux
+*.lof
+*.log
+*.out
+COEmain.pdf
+*.gz
+*.toc
+*.bak
