@@ -15,11 +15,11 @@
 
     \subsection{Linphone项目框架}
     Linphone是一个开源视频通话软件，平台支持非常全面，包括Windows、MAC OSX、Linux、Android、iOS等。其核心模块为Liblinphone库，实现了除用户界面以外的所有Linphone功能，并且提供了丰富的用户接口，如音频、视频通话的发起、结束、设置等。Liblinphone库包含了三个功能模块，分别是：
-    \begin{description}
-        \item[Mediastreamer2] 流媒体处理，包括音、视频的采集、编解码等功能
-        \item[oRTP] 负责流媒体传输，RTP和RTCP协议的具体实现
-        \item[belle-sip] 提供SIP协议支持的库
-    \end{description}
+    \begin{itemize}
+        \item Mediastreamer2：流媒体处理，包括音、视频的采集、编解码等功能
+        \item oRTP：负责流媒体传输，RTP和RTCP协议的具体实现
+        \item belle-sip：提供SIP协议支持的库
+    \end{itemize}
     以上所有Liblinphone的内容都采用纯C代码实现。在TVphone的开发中，我们主要关注包含视频处理的Mediastreamer2模块和负责视频传输的oRTP模块。
 
     \begin{figure}[htbp]
@@ -64,7 +64,7 @@
     \begin{lstlisting}[language=C]
 int rc_process_rtcp(MSQosAnalyzer *objbase, mblk_t *rtcp);
     \end{lstlisting}
-    
+
     码率自适应模块对上层提供的接口只有一个函数\lstinline!rc_process_rtcp!，该函数以RTCP包为输入，完成网络状态信息收集、码率计算、定时反馈等任务。其输入 \lstinline!objbase! 指向码率自适应模块的内存实体，记录码率自适应算法的设置、历史信息等； \lstinline!rtcp! 指向接收到的RTCP包。输出为代表函数执行状态的整数代码。函数在系统收到携带网络状态信息的RTCP包时被调用。
 
     \subsubsection{模块介绍}
@@ -100,7 +100,7 @@ int fec_outgoing_rtp(MSFecDriver *obj, mblk_t *rtp);
 int fec_incoming_rtp(MSFecDriver *obj, mblk_t *rtp);
 int fec_incoming_rtcp(MSFecDriver *obj, mblk_t *rtcp);
     \end{lstlisting}
-    
+
     其中 \lstinline!fec_set_rate! 可以动态调整差错保护的平均冗余率，在系统初始化时调用，也可以在系统运行中根据网络状态调用该函数修改冗余率。当发送端 MSRtpSend 模块准备发送RTP包时，首先调用 \lstinline!fec_outgoing_rtp! 对RTP包进行缓存、FEC编码并发送FEC数据包（通过RTCP协议封装）。 当接收端 MSRtpRecv 模块收到RTP包或携带冗余数据的RTCP 数据包时，分别调用 \lstinline!fec_incoming_rtp! 和 \lstinline!fec_incoming_rtcp! 进行数据缓存、FEC解码并恢复丢失的RTP数据包。
 
     \subsubsection{模块介绍}
@@ -138,7 +138,7 @@ int fec_incoming_rtcp(MSFecDriver *obj, mblk_t *rtcp);
 
     \subsubsection{冗余率和冗余分配优化}
     如果系统冗余率明显超出了纠正丢包所需的比例，会有大量冗余包得不到利用而造成网络带宽的浪费；而如果冗余率过低，又会造成大量丢包无法恢复，通话质量得不到保证。为了尽可能使冗余率适应网络需求，我们增加了一个简单的冗余率自适应功能。即如果网络丢包率连续三次高于 $5\%$ 则提高一档冗余率，如果网络丢包率连续三次低于 $1\%$ 则降低一档冗余率。经测试这一简单策略可以较好地实现网络变化时的冗余率自适应。
-    
+
     针对第\ref{chap:fec}章中提出的冗余分配优化算法，我们需要根据当前网络的丢包率以及当前视频GOP中不同位置视频帧的特性计算合理的冗余分配方案。如果对于每个GOP都重新计算，将会严重增加客户端的计算负载，并且实时性也无法得到满足。因此我们每隔1分钟采样一次当前平均丢包率和GOP的视频帧特性，通过算法\ref{al:hc}计算最优冗余分配，并在下一次采样计算前的所有RS 编码中使用这一分配策略。
 
 
