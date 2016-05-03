@@ -16,15 +16,23 @@
 \end{algorithmic}
 其中$P_{loss}$为当前丢包率，$P_{threshold}$为判断网络拥塞的丢包率阈值，$r$是发送数据的码率，$AIR$为每次码率增加的数值。容易看出这是一种``加性增，乘性''(Additive Increase Multiplicative Decrease, AIMD)的策略。与之相应的是在 \cite{turletti1996videoconferencing} 中提出``乘性增，乘性''(Multiplicative Increase Multiplicative Decrease, MIMD)策略。由于检测到丢包率明显上升时，说明网络拥塞已经发生，因此上述方法都需要通过``乘性减''策略保证码率下降速度足够快，以使网络尽快从拥塞中恢复。
 
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.7\textwidth]{intro_block_diagram.pdf}
+  \caption{基本控制框图}
+  \label{fig:intro_block_diagram}
+\end{figure}
+
 一种更加直接的拥塞控制方式是通过对网络建模，显式地预测网络带宽的数值。如Floyd \cite{floyd1999promoting} 等人给出的码率估算模型
 \begin{equation}
   r \le \frac{1.5\sqrt{2/3} * MTU}{RTT * \sqrt{p}}
 \end{equation}
-其中$MTU$(Maximum transit unit)为当前网络最大传输单元，$RTT$(Round Trip Time)为数据包往返时延。与此类似的还有专为多媒体流传输设计的TFRC(TCP Friendly Rate Control) 协议 \cite{handley2003tcp}，该协议兼顾了码率上升的速度，从而避免引起网络上其他采用TCP协议的数据流的``饥饿''现象。
+其中$MTU$(Maximum transit unit)为当前网络最大传输单元，$RTT$(Round Trip Time)为数据包往返时延。与此类似的还有专为多媒体流传输设计的TFRC(TCP Friendly Rate Control) 协议 \cite{handley2003tcp}，该协议兼顾了码率上升的速度，从而避免引起网络上其他采用TCP协议的数据流的``饥饿''现象。基于模型的拥塞控制算法可以看做一个闭环控制模型，以网络状态作为反馈输入，目标视频码率作为输出。而PID控制器由于其简单且良好的控制性能，在很多研究中被应用在拥塞控制模型中以提高系统表现。Wong \cite{wong2004pid} 等人给出了如图 \ref{fig:intro_block_diagram} 所示的实时视频传输基本闭环控制框图，其中系统目标状态$S_0$和系统当前状态$S_0$的差值$E$作为PID控制器的输入，控制器输入下一时刻的目标码率$R$，这一码率被设定在受控系统中，经过一定时间的运行产生下一控制时刻的系统状态$S$。
+Tian \cite{tian2012towards} 等人将PID控制器应用在DASH视频直播系统中以兼顾码率控制过程中的反应速度和平滑性，也得到了较好的效果。
 
 
 一直以来，传统拥塞控制算法都以丢包率作为最主要的网络拥塞信号，这往往会带来一些问题。Gettys \cite{gettys2012bufferbloat} 等人指出，由于传统网络中对于各种缓冲区的过度利用，`` 缓冲区膨胀''(bufferbloat) 的趋势变得越来越明显。过多的缓冲使得数据包的传输延迟越来越大，这使得人们重新注意到实时流媒体传输对于低延迟的需求。
-很多基于模型的拥塞控制算法已经引入了传输延迟作为网络探测的信号，如TCP Vegas \cite{brakmo1995tcp} 、TCP-LP \cite{kuzmanovic2003tcp}、LEDBAT \cite{shalunov2012low}等，这有利于实时传输中对延迟的控制，然而这些算法主要利用延迟作为避免与TCP过度竞争的手段，实际应用中仍然存在延迟累积等问题。在Zhu \cite{zhu2013nada} 等人提出的NADA算法中，传输延迟、丢包、显示拥塞通告（explicit congestion notification，ECN）标记三种网络信息被整合为一个``等效延迟''$\widetilde{d_n}$如下
+很多基于模型的拥塞控制算法已经引入了传输延迟作为网络探测的信号，如TCP Vegas \cite{brakmo1995tcp} 、TCP-LP \cite{kuzmanovic2003tcp}、LEDBAT \cite{shalunov2012low}等，这有利于实时传输中对延迟的控制，然而这些算法主要利用延迟作为避免与TCP过度竞争的手段，实际应用中仍然存在延迟累积等问题。在Zhu \cite{zhu2013nada} 等人最近提出的NADA算法中，传输延迟、丢包、显示拥塞通告（explicit congestion notification，ECN）标记三种网络信息被整合为一个``等效延迟''$\widetilde{d_n}$如下
 \begin{equation}
   \widetilde{d_n} = d_n + 1_n^M d_M + 1_n^L d_L
 \end{equation}
@@ -32,13 +40,21 @@
 \begin{equation}
   R = R_{min} + w(R_{max} - R_{min}) \frac{d_ref}{\widetilde{d_n}}
 \end{equation}
+其中$R_{min}$和$R_{max}$代表与视频内容和视频编码器相关的码率范围，每个视频流可以指定一个权重$w$，来获取不同比例的网络带宽。$d_ref$是认为设定的目标网络延迟。
 尽管这一思路综合考虑了丢包和延迟对码率的影响，但是其整合公式和码率调整公式都比较直接，在高度动态的网络下很难取得预期的效果。
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.8\textwidth]{gcc_state.jpg}
-  \caption{WebRTC算法的有限状态机模型}
+  \includegraphics[width=0.7\textwidth]{gcc_state.pdf}
+  \caption{WebRTC拥塞控制算法的有限状态机模型}
   \label{fig:gcc_state}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.5\textwidth]{skype_state.pdf}
+  \caption{Skype拥塞控制算法的有限状态机模型}
+  \label{fig:skype_state}
 \end{figure}
 
 以上用于实时视频的码率自适应方法都在很大程度上借鉴了传统拥塞控制算法的思想，而随着近年来互联网的发展，实时视频服务的研究在学术和工业界都获得了大量的关注。随着Skype、FaceTime、WebRTC等视频通话应用的兴起，一些应用在实际软件中的全新码率自适应算法也随之出现。De \cite{de2013experimental} 等人分析了Google在WebRTC中采用的发送、接收端混合码率自适应算法。其发送端采用基于丢包率的MIMD算法，并综合了TFRC算法
@@ -57,14 +73,16 @@
     r_{t-1}      &   Hold
   \end{array} \right.
 \end{equation}
-其中$R_t$为接收端统计的当前接收速率。在开源VoIP软件Linphone \cite{website:linphone}的底层代码中，也发现了使用有限状态机对网络状态进行检测并针对不同状态应用不同码率调整策略的算法。
+其中$R_t$为接收端统计的当前接收速率。
+LD Cicco \cite{cicco2010mathematical} 等人对Skype的研究也给出了极其相似的基于有限状态机的控制算法，其状态转移过程如图 \ref{fig:skype_state} 所示。
+在开源VoIP软件Linphone \cite{website:linphone}的底层代码中，也出现了使用有限状态机对网络状态进行检测并针对不同状态应用不同码率调整策略的算法。
 
-尽管实时多媒体流传输的码率控制问题已经获得了大量关注并在学术和工业界出现了各种算法，但目前还没有一种算法在效果方面得到广泛认同。目前互联网工程任务组(The Internet Engineering Task Force, IETF)仍有一个工作组RMCAT \cite{website:rmcat} 负责收集用于音视频实时传输的拥塞控制算法。这也是在我们的研究中努力解决的一个问题。
+尽管实时多媒体流传输的码率控制问题已经获得了大量关注并在学术和工业界出现了各种算法，但目前还没有一种算法在效果方面得到广泛认同。目前互联网工程任务组(The Internet Engineering Task Force, IETF)的一个工作组RMCAT \cite{website:rmcat} 正在收集用于音视频实时传输的拥塞控制算法。这也是在我们的研究中努力解决的一个问题。
 
 
 \section{实时视频流的非对称差错保护}
 \label{section:fec_intro}
-在网络传输过程中，由于网络拥塞、路由器转发错误、信道错误等问题不可避免地会发生丢包。视频编码传输过程中为了压缩数据量采用的帧内和帧间压缩策略使其对数据错误十分敏感，一旦发生错误或丢包，可能对视频解码过程产生非常严重的影响，造成连续多帧的失真 \cite{stockhammer2003h}。因此我们有必要在传输过程中进行差错控制。
+在网络传输过程中，由于网络拥塞、路由器转发错误、信道错误等问题不可避免地会发生丢包。而视频编码传输过程中为了压缩数据量采用的帧内和帧间压缩策略使其对数据错误十分敏感，一旦发生错误或丢包，可能对视频解码过程产生非常严重的影响，造成连续多帧的失真 \cite{stockhammer2003h}。因此我们有必要在传输过程中进行差错控制。
 
 信道上的差错控制技术就是传统的信道编码，是为了克服信道错误而采取的必要措施。信道编码在发送端以某种确定的关联规则（约束）计算校验码元或监督码元，附在被传输的信息序列上。接收端按照既定的规则检查相应码元，如果传输过程中有信息错误或丢失，将会检测到关联信息的变化，从而实现发现错误，乃至纠正错误 \cite{陈敏2004网络实时视频传输研究, wang1998error, wang2000error} 。
 基于信道编码的差错控制主要包括检错重传和前向纠错两种：
@@ -91,7 +109,12 @@
 & & R_C(\vec F) \le R_T - R_S \\
 \end{aligned}
 \end{equation}
-其中$D_j$表示第$j$个BOP(Block of Pictures)的整体失真，$P_R$是$RS(N_j, K_j)$进行冗余编码后的丢包率，$R_C(\vec F)$表示冗余分配的码率限制。求解这一带约束的优化问题即可得到最优冗余分配。然而，大部分FEC 框架的冗余保护效果依赖于较大的编码块，而包含多帧数据的编码块会引入额外的播放延迟，这对实时视频传输的效果有很大影响 \cite{wang2000error}。
+其中$D_j$表示第$j$个BOP(Block of Pictures)的整体失真，$P_R$是$RS(N_j, K_j)$进行冗余编码后的丢包率，$R_C(\vec F)$表示冗余分配的码率限制。求解这一带约束的优化问题即可得到最优冗余分配。
+
+然而，大部分FEC 框架的冗余保护效果依赖于较大的编码块，而包含多帧数据的编码块会引入额外的播放延迟，这对实时视频传输的效果有很大影响 \cite{wang2000error}。
+在 \cite{baccaglini2008slice, bouabdallah2006dependency} 中，RS编码块包含了整个GOP中的所有数据包，因此在编解码过程中引入一个GOP的额外延迟。
+Yang \cite{yang2005unequal} 等人的方法中，RS编码块中包含部分视频帧中的部分数据包(block of packets, BOP)，这也引入了一个BOP的额外延迟，延迟大小取决于BOP的大小。
+为了彻底解决这一问题，Thomos \cite{thomos2006robust} 等人提出一种编码块只包含单个视频帧的RS编码方法，尽管这种编码块设置不会引入任何额外延迟，然而其编码效率却大打折扣。因此，如何解决编码效率和额外延迟之间的矛盾也成为影响实时视频差错保护的关键。
 
 \begin{figure}[htbp]
   \centering
@@ -100,4 +123,4 @@
   \label{fig:ew_fec}
 \end{figure}
 
-随着相关研究的深入，一种能解决FEC编码块大小和额外延迟之间矛盾的扩展窗口RS编码框架(Expanding Window Reed-Solomon code, EW-RS)被提出 \cite{sejdinovic2009expanding}。 该框架编码过程如图\ref{fig:ew_fec} 所示，GOP 中第$n$个视频帧的冗余数据包$C_n$包含的编码块由第$1\le i\le n$ 帧的所有数据包组成。通过这一扩展窗口的编码块设置，编码块大小在不引入额外播放延迟的条件下得到了很大的增加。值得一提的是，这一框架还包含了非对称差错保护思想，即越靠前的数据包得到越多的保护。在 \cite{sejdinovic2009expanding, nazir2011expanding} 中，基于扩展窗口的喷泉编码模型被提出；基于扩展窗口的可伸缩视频编码（SVC）也在 \cite{vukobratovic2009scalable, hellge2011layer} 中被提出。在一项最近的工作中，Xiao \cite{xiao2013real} 等人提出了基于源数据包随机交换的Reed-Solomon 扩展窗口编码框架。
+随着相关研究的深入，一种能解决FEC编码块大小和额外延迟之间矛盾的扩展窗口RS编码框架(Expanding Window Reed-Solomon code, EW-RS)被提出 \cite{sejdinovic2009expanding}。 该框架编码过程如图\ref{fig:ew_fec} 所示，GOP 中第$n$个视频帧的冗余数据包$C_n$包含的编码块由第$1\le i\le n$ 帧的所有数据包组成。通过这一扩展窗口的编码块设置，编码块大小在不引入额外播放延迟的条件下得到了很大的增加。值得一提的是，这一框架还包含了非对称差错保护思想，即越靠前的数据包得到越多的保护。在 \cite{sejdinovic2009expanding, nazir2011expanding} 中，基于扩展窗口的喷泉编码模型被提出；基于扩展窗口的可伸缩视频编码（SVC）也在 \cite{vukobratovic2009scalable, hellge2011layer} 中被提出。在一项最近的工作中，Xiao \cite{xiao2013real} 等人提出了基于源数据包随机交换的Reed-Solomon 扩展窗口编码框架，该方法使用了简单有效的RS编码并通过参数随机交换解决了联立解码时的秩损失问题，具有实现简单，无额外延迟等优点。
