@@ -16,7 +16,7 @@
 
     \begin{figure}[htbp]
       \centering
-      \includegraphics[width=0.4\textwidth]{sys_linphone_arch.pdf}
+      \includegraphics[width=0.36\textwidth]{sys_linphone_arch.pdf}
       \caption{Linphone整体框架}
       \label{fig:sys_linphone_arch}
     \end{figure}
@@ -31,7 +31,7 @@
 
     \begin{figure}[htbp]
       \centering
-      \includegraphics[width=0.9\textwidth]{linphone1.pdf}
+      \includegraphics[width=1\textwidth]{linphone1.pdf}
       \caption{Liblinphone系统框架}
       \label{fig:linphone1}
     \end{figure}
@@ -52,7 +52,7 @@
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.95\textwidth]{linphone2.pdf}
+  \includegraphics[width=1\textwidth]{linphone2.pdf}
   \caption{Liblinphone改进系统框架}
   \label{fig:linphone2}
 \end{figure}
@@ -79,7 +79,7 @@ int rc_process_rtcp(MSQosAnalyzer *objbase, mblk_t *rtcp);
     \subsubsection{模块设计框架}
     \begin{figure}[htbp]
       \centering
-      \includegraphics[width=0.8\textwidth]{rate_control.pdf}
+      \includegraphics[width=0.7\textwidth]{rate_control.pdf}
       \caption{码率自适应模块设计框架}
       \label{fig:rate_control_arch}
     \end{figure}
@@ -131,7 +131,7 @@ int fec_incoming_rtcp(MSFecDriver *obj, mblk_t *rtcp);
     \subsubsection{扩展窗口RS编解码实现}
     \begin{figure}[htbp]
       \centering
-      \includegraphics[width=0.25\textwidth]{fec_enc_seq.pdf}
+      \includegraphics[width=0.27\textwidth]{fec_enc_seq.pdf}
       \caption{扩展窗口RS编码流程图}
       \label{fig:fec_enc_seq}
     \end{figure}
@@ -157,7 +157,7 @@ int fec_incoming_rtcp(MSFecDriver *obj, mblk_t *rtcp);
 
     \begin{figure}[htbp]
       \centering
-      \includegraphics[width=0.5\textwidth]{fec_dec_buf_state.pdf}
+      \includegraphics[width=0.6\textwidth]{fec_dec_buf_state.pdf}
       \caption{解码缓冲区更新}
       \label{fig:fec_dec_buf_state}
     \end{figure}
@@ -212,12 +212,12 @@ int fec_incoming_rtcp(MSFecDriver *obj, mblk_t *rtcp);
 
 \section{实验验证}
 
-TVPhone的目标是在无线网络环境下，提供面向手机和电视的高清视频通话服务。为了验证其服务效果，我们在手机和电视盒子上安装了TVPhone应用，并在真实无线网络环境下进行了测试。为了得到更全面的实验数据，我们还利用模拟器对不同网络状况进行了模拟，并对通话过程中的日志、视频文件进行记录和分析。
+TVPhone的目标是在无线网络环境下，提供面向手机和电视的高清视频通话服务。为了验证其服务效果，我们在安卓手机和一款名为乐橙的带摄像头电视盒子上安装了TVPhone应用，并在真实无线网络环境下进行了测试。为了得到更全面的实验数据，我们还利用模拟器对不同网络状况进行了模拟，并对通话过程中的日志、视频文件进行记录和分析。
 
 \subsection{实验设置}
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.6\textwidth]{exp_env.pdf}
+  \includegraphics[width=0.7\textwidth]{exp_env.pdf}
   \caption{测试平台设置}
   \label{fig:exp_env}
 \end{figure}
@@ -266,7 +266,7 @@ TVPhone的目标是在无线网络环境下，提供面向手机和电视的高�
 
 不同带宽条件下系统码率自适应算法的表现，我们已经在第 \ref{chap:rate}章进行过详细测试，这里不再赘述。
 
-在真实网络环境测试中，我们在较差的Wi-Fi信号条件下运行Linphone和TVPohne一段时间，两个系统在画面表现上具有较明显的差别。图 \ref{fig:exp_video} 截取了两个系统在模拟环境中运行的画面，从中可以看到，左侧的Linphone 通话画面画质较差，而且存在丢包造成的马赛克，与TVPhone 形成鲜明对比。
+在真实网络环境测试中，我们在较差的Wi-Fi信号条件下运行Linphone和TVPhone一段时间，两个系统在画面表现上具有较明显的差别。图 \ref{fig:exp_video} 截取了两个系统在模拟环境中运行的画面，从中可以看到，左侧的Linphone 通话画面画质较差，而且存在丢包造成的马赛克，与TVPhone 形成鲜明对比。
 
 \section{本章小结}
 在无线网络覆盖率越来越高，人们对视频通话需求日渐旺盛，而电视盒子的出现为视频通话提供了大屏幕载体的背景下，我们利用算法上的优势实现了一个面向电视盒子的高清实时视频通话系统。为此，我们调研了一个开源视频通话软件，对其整体架构、各部分模块的具体实现、底层算法都进行了总结和梳理。以此为基础，我们将新的算法实现为独立模块植入原有系统中，解决了一系列代码实现和软件兼容问题，成功升级了该视频通话软件的内核，提高了其视频传输的质量。为了拓展高清视频通话的应用场景，我们还重新设计的该系统的用户界面，将其移植到大屏幕的电视盒子上，创造了一种新的高清视频通话体验。
